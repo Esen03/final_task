@@ -5,7 +5,7 @@ const BlogsCreatePage = () => {
     const [popularPosts, setPopularPosts] = useState([]);
     const [tags, setTags] = useState([]);
     const [selectedTable, setSelectedTable] = useState('posts');
-
+    
     const fetchData = async (dataType) => {
         try {
             const url = base_url + dataType;
@@ -24,11 +24,44 @@ const BlogsCreatePage = () => {
     useEffect(() => {
         fetchData('popularPosts');
         fetchData('tags');
+
+        createNewPost('posts');
     }, []);
 
-   
+    const createNewPost = async () => {
+        const newPostData = {
+            title: "Новый пост",
+            titleDesc: "dfdffdf",
+            imgUrl: "URl",
+            desc: "Содержим",
+            countComments: 0,
+            createdDate: new Date(),
+        };
 
-    
+        const url = base_url + "posts";
+
+        const options = {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newPostData),
+        };
+
+        try {
+            const res = await fetch(url, options);
+            if (res.ok) {
+                console.log("Новый пост успешно создан");
+                const newPost = await res.json();
+                setPopularPosts([...popularPosts, newPost]); 
+            } else {
+                console.error('Ошибка при создании нового поста');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const handleDeleteData = async (dataType, dataId) => {
         try {
             const url = base_url + `${dataType}/${dataId}`;
@@ -52,7 +85,6 @@ const BlogsCreatePage = () => {
         }
     };
 
-
     return (
         <div className="w3-container">
             <input type="text" value={selectedTable} onChange={(e) => setSelectedTable(e.target.value)} placeholder="Введите название таблицы (posts, tags, popularPosts)" />
@@ -73,7 +105,7 @@ const BlogsCreatePage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {posts.map(post => (
+                                {popularPosts.map(post => (
                                     <tr key={post.id}>
                                         <td>{post.id}</td>
                                         <td>{post.title}</td>
@@ -89,66 +121,65 @@ const BlogsCreatePage = () => {
                     </div>
                 </div>
             )}
-{selectedTable === 'popularPosts' && (
-    <div className="w3-panel w3-card-4 w3-auto">
-        <div className="w3-indigo w3-panel">
-            <h1>Popular Posts</h1>
-        </div>
-        <div className="w3-panel">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {popularPosts.map(post => (
-                        <tr key={post.id}>
-                            <td>{post.id}</td>
-                            <td>{post.title}</td>
-                            <td>
-                                <button onClick={() => handleDeleteData('popularPosts', post.id)}>Удалить</button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    </div>
-)}
-
-       {selectedTable === 'tags' && (
-    <div className="w3-panel w3-card-4 w3-auto">
-        <div className="w3-indigo w3-panel">
-            <h1>Tags</h1>
-        </div>
-        <div className="w3-panel">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tags.map(tag => (
-                        <tr key={tag.id}>
-                            <td>{tag.id}</td>
-                            <td>{tag.name}</td>
-                            <td>
-                                <button onClick={() => handleDeleteData('tags', tag.id)}>Удалить</button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    </div>
-)}
-         
+            {selectedTable === 'popularPosts' && (
+                <div className="w3-panel w3-card-4 w3-auto">
+                    <div className="w3-indigo w3-panel">
+                        <h1>Popular Posts</h1>
+                    </div>
+                    <div className="w3-panel">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {popularPosts.map(post => (
+                                    <tr key={post.id}>
+                                        <td>{post.id}</td>
+                                        <td>{post.title}</td>
+                                        <td>
+                                            <button onClick={() => handleDeleteData('popularPosts', post.id)}>Удалить</button>
+                                         </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+            {selectedTable === 'tags' && (
+                <div className="w3-panel w3-card-4 w3-auto">
+                    <div className="w3-indigo w3-panel">
+                        <h1>Tags</h1>
+                    </div>
+                    <div className="w3-panel">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tags.map(tag => (
+                                    <tr key={tag.id}>
+                                        <td>{tag.id}</td>
+                                        <td>{tag.name}</td>
+                                        <td>
+                                         <button onClick={() => handleDeleteData('tags', tag.id)}>Удалить</button>
+                                         </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
 
 export default BlogsCreatePage;
